@@ -51,7 +51,7 @@ pbjs.renderAd = function(doc, adId, dataObject) {
  */
 function renderLegacy(doc, adId) {
   let w = window;
-  for (i = 0; i < 10; i++) {
+  for (let i = 0; i < 10; i++) {
     w = w.parent;
     if (w.pbjs) {
       try {
@@ -196,6 +196,9 @@ function responseCallback(isMobileApp) {
         utils.insertElement(commentElm, document, 'body');
         utils.writeAdUrl(nurl, width, height);
       }
+    }
+    if (bidObject.burl) {
+      utils.triggerBurl(bidObject.burl);
     }
   }
 };
