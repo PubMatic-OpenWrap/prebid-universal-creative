@@ -1,4 +1,4 @@
-const ENDPOINT = 'https://prebid.adnxs.com/pbs/v1/cookie_sync';
+const ENDPOINT = 'https://ow.pubmatic.com/cookie_sync';
 
 function doBidderSync(type, url, bidder) {
   if (!url) {
@@ -19,6 +19,7 @@ function triggerPixel(url) {
 }
 
 function process(response) {
+  debugger;
   let result = JSON.parse(response);
   if (result.status === 'OK' || result.status === 'no_cookie') {
     if (result.bidder_status) {
@@ -95,5 +96,16 @@ function ajax(url, callback, data, options = {}) {
 
 // Send empty data to receive cookie sync status for all prebid server adapters.
 // In next phase we will read placement id's from query param and will only get cookie sync status of bidders participating in auction
-var data = '{}';
+var data = JSON.stringify({
+  "uuid": "pubmatic" + (Math.random()*10000).toFixed(4),
+  "bidders": [
+      "appnexus",
+      "audienceNetwork",
+      "pubmatic",
+      "rubicon",
+      "pulsepoint",
+      "indexExchange",
+      "lifestreet"
+  ]
+});
 ajax(ENDPOINT, process, data);
