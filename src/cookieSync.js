@@ -64,7 +64,6 @@ function createTrackPixelIframeHtml(url, encodeUri = true) {
 
 
 function process(response) {
-  debugger;
   let result = JSON.parse(response);
   if (result.status === 'OK' || result.status === 'no_cookie') {
     if (result.bidder_status) {
