@@ -15,8 +15,6 @@ function doBidderSync(type, url, bidder) {
   }
 }
 
-
-
 function triggerPixel(url) {
   const img = new Image();
   img.src = url;
@@ -24,7 +22,7 @@ function triggerPixel(url) {
 
 function insertUserSyncIframe(url) {
   let iframe = document.createElement('iframe');
-  iframe.src=url;
+  iframe.src = url;
   insertElement(iframe);
 };
 
@@ -45,27 +43,10 @@ function insertElement(elm, doc, target) {
   } catch (e) {}
 };
 
-function createTrackPixelIframeHtml(url, encodeUri = true) {
-  if (!url) {
-    return '';
-  }
-  if (encodeUri) {
-    url = encodeURI(url);
-  }
-
-  return `<amp-iframe width="1" title="User Sync"
-    height="1"
-    sandbox="allow-same-origin allow-forms allow-scripts allow-modals allow-popups allow-popups-to-escape-sandbox allow-top-navigation"
-    frameborder="0"
-    src="${url}">
-    <amp-img layout="fill" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" placeholder></amp-img>
-  </amp-iframe>`
-};
-
 
 function process(response) {
   let result = JSON.parse(response);
-  if (result.status === 'OK' || result.status === 'no_cookie') {
+  if (result.status.toLowerCase() === 'ok' || result.status.toLowerCase() === 'no_cookie') {
     if (result.bidder_status) {
       result.bidder_status.forEach(bidder => {
         if (bidder.no_cookie) {
@@ -83,10 +64,10 @@ function ajax(url, callback, data, options = {}) {
     let method = options.method || (data ? 'POST' : 'GET');
 
     let callbacks = typeof callback === 'object' ? callback : {
-      success: function() {
+      success: function () {
         console.log('xhr success');
       },
-      error: function(e) {
+      error: function (e) {
         console.log('xhr error', null, e);
       }
     };
@@ -127,7 +108,7 @@ function ajax(url, callback, data, options = {}) {
       x.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     }
     x.setRequestHeader('Content-Type', options.contentType || 'text/plain');
-    
+
     if (method === 'POST' && data) {
       x.send(data);
     } else {
@@ -138,47 +119,51 @@ function ajax(url, callback, data, options = {}) {
   }
 }
 
-function getUrlParam(paramName){
-   if(paramName && paramName.length>0){
+function getUrlParam(paramName) {
+  if (paramName && paramName.length > 0) {
     var sPageURL = window.location.search.substring(1);
-    var sURLVariables = sPageURL.split('&');
-    for (var i = 0; i < sURLVariables.length; i++) 
-    {
+    if (sPageURL) {
+      var sURLVariables = sPageURL.split('&');
+      for (var i = 0; i < sURLVariables.length; i++) {
         var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] == paramName) 
-        {
-            return sParameterName[1];
+        if (sParameterName && sParameterName.length == 2 && sParameterName[0] == paramName) {
+          return sParameterName[1];
         }
+      }
     }
-   }
+  }
 }
 
-function getBidders(){
-  var bidders =  getUrlParam("bidders") ;
-  if(bidders && bidders.length>0){
-      var bidderArray = bidders.split(",");
-      if(bidderArray && bidderArray.length>0){
-        return bidderArray
-      }
-      else{
-         return  [
-          "appnexus",
-          "audienceNetwork",
-          "pubmatic",
-          "rubicon",
-          "pulsepoint",
-          "indexExchange",
-          "lifestreet"
+function getBidders() {
+  var bidders = getUrlParam("bidders");
+  if (bidders && bidders.length > 0) {
+    var bidderArray = bidders.split(",");
+    if (bidderArray && bidderArray.length > 0) {
+      return bidderArray;
+    } else {
+      return [
+        "appnexus",
+        "audienceNetwork",
+        "pubmatic",
+        "rubicon",
+        "pulsepoint",
+        "indexExchange",
+        "lifestreet"
       ];
-      }
+    }
   }
 }
 
 
 var data = JSON.stringify({
-  "uuid": "pubmatic" + (Math.random()*10000).toFixed(4),
-  "pubid":getUrlParam("pubid") || 0,
-  "profid":getUrlParam("profid") || 0,
+  "uuid": "pubmatic" + (Math.random() * 10000).toFixed(4),
+  "pubid": getUrlParam("pubid") || 0,
+  "profid": getUrlParam("profid") || 0,
   "bidders": getBidders()
 });
-ajax(ENDPOINT, process, data);
+
+var ajaxConfig = {
+  withCredentials: true
+};
+
+ajax(ENDPOINT, process, data, ajaxConfig);
