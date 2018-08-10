@@ -1,4 +1,19 @@
+import * as utils from './utils';
+
 const ENDPOINT = 'https://ow.pubmatic.com/cookie_sync';
+const STATUS = {
+  OK: "ok",
+  NO_COOKIE: "no_cookie"
+};
+const BIDDER_ARRAY =[
+  "appnexus",
+  "audienceNetwork",
+  "pubmatic",
+  "rubicon",
+  "pulsepoint",
+  "indexExchange",
+  "lifestreet"
+];
 
 function doBidderSync(type, url, bidder) {
   if (!url) {
@@ -21,32 +36,16 @@ function triggerPixel(url) {
 }
 
 function insertUserSyncIframe(url) {
-  let iframe = document.createElement('iframe');
+  const iframe = utils.getEmptyIframe(0,0);
+  iframe.style.display = 'inline';
+  iframe.style.overflow = 'hidden';
   iframe.src = url;
-  insertElement(iframe);
+  utils.insertElement(iframe, document, 'body');
 };
-
-function insertElement(elm, doc, target) {
-  doc = doc || document;
-  let elToAppend;
-  if (target) {
-    elToAppend = doc.getElementsByTagName(target);
-  } else {
-    elToAppend = doc.getElementsByTagName('head');
-  }
-  try {
-    elToAppend = elToAppend.length ? elToAppend : doc.getElementsByTagName('body');
-    if (elToAppend.length) {
-      elToAppend = elToAppend[0];
-      elToAppend.insertBefore(elm, elToAppend.firstChild);
-    }
-  } catch (e) {}
-};
-
 
 function process(response) {
   let result = JSON.parse(response);
-  if (result.status.toLowerCase() === 'ok' || result.status.toLowerCase() === 'no_cookie') {
+  if (result.status.toLowerCase() === STATUS.OK || result.status.toLowerCase() === STATUS.NO_COOKIE) {
     if (result.bidder_status) {
       result.bidder_status.forEach(bidder => {
         if (bidder.no_cookie) {
@@ -119,46 +118,22 @@ function ajax(url, callback, data, options = {}) {
   }
 }
 
-function getUrlParam(paramName) {
-  if (paramName && paramName.length > 0) {
-    var sPageURL = window.location.search.substring(1);
-    if (sPageURL) {
-      var sURLVariables = sPageURL.split('&');
-      for (var i = 0; i < sURLVariables.length; i++) {
-        var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName && sParameterName.length == 2 && sParameterName[0] == paramName) {
-          return sParameterName[1];
-        }
-      }
-    }
-  }
-}
-
 function getBidders() {
-  var bidders = getUrlParam("bidders");
+  var bidders = utils.getUrlParam("bidders");
   if (bidders && bidders.length > 0) {
     var bidderArray = bidders.split(",");
     if (bidderArray && bidderArray.length > 0) {
       return bidderArray;
-    } else {
-      return [
-        "appnexus",
-        "audienceNetwork",
-        "pubmatic",
-        "rubicon",
-        "pulsepoint",
-        "indexExchange",
-        "lifestreet"
-      ];
     }
+  } else {
+    return BIDDER_ARRAY;
   }
 }
 
 
 var data = JSON.stringify({
-  "uuid": "pubmatic" + (Math.random() * 10000).toFixed(4),
-  "pubid": getUrlParam("pubid") || 0,
-  "profid": getUrlParam("profid") || 0,
+  "pubid": utils.getUrlParam("pubid") || 0,
+  "profid": utils.getUrlParam("profid") || 0,
   "bidders": getBidders()
 });
 

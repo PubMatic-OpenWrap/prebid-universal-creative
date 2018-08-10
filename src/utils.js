@@ -1,4 +1,5 @@
 const postscribe = require('postscribe');
+var urlParams = {};
 
 export function createTrackPixelHtml(url) {
   if (!url) {
@@ -136,3 +137,26 @@ export function triggerBurl(url) {
   img.src = url;
 };
 
+export function setUrlParams(paramName) {
+  var sPageURL = window.location.search.substring(1);
+  if (sPageURL) {
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) {
+      var sParameterName = sURLVariables[i].split('=');
+      if (sParameterName && sParameterName.length == 2 && undefined == urlParams[sParameterName[0]]) {
+        urlParams[sParameterName[0]]=  sParameterName[1];
+      }
+    }
+  }
+  if(paramName && paramName!=""){
+    urlParams[paramName];
+  }
+}
+
+export function getUrlParam(paramName) {
+  if (urlParams && Object.keys(urlParams).length > 0) {
+    return urlParams[paramName];
+  } else {
+    setUrlParams(paramName);
+  }
+}
