@@ -4,8 +4,7 @@
   "description": "",
   "main": "dist/creative.js",
   "scripts": {
-    "test": "echo test",
-    "prepublish": "gulp build"
+    "test": "echo test"
   },
   "repository": {
     "type": "git",
