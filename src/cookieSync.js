@@ -1,4 +1,3 @@
-import * as utils from './utils';
 
 const ENDPOINT = 'https://ow.pubmatic.com/cookie_sync';
 const STATUS = {
@@ -14,6 +13,8 @@ const BIDDER_ARRAY =[
   "indexExchange",
   "lifestreet"
 ];
+var urlParams = {};
+
 
 function doBidderSync(type, url, bidder) {
   if (!url) {
@@ -36,11 +37,11 @@ function triggerPixel(url) {
 }
 
 function insertUserSyncIframe(url) {
-  const iframe = utils.getEmptyIframe(0,0);
+  const iframe = getEmptyIframe(0,0);
   iframe.style.display = 'inline';
   iframe.style.overflow = 'hidden';
   iframe.src = url;
-  utils.insertElement(iframe, document, 'body');
+  insertElement(iframe, document, 'body');
 };
 
 function process(response) {
@@ -119,7 +120,7 @@ function ajax(url, callback, data, options = {}) {
 }
 
 function getBidders() {
-  var bidders = utils.getUrlParam("bidders");
+  var bidders = getUrlParam("bidders");
   if (bidders && bidders.length > 0) {
     var bidderArray = bidders.split(",");
     if (bidderArray && bidderArray.length > 0) {
@@ -130,10 +131,70 @@ function getBidders() {
   }
 }
 
+function getEmptyIframe(height, width) {
+  let frame = document.createElement('iframe');
+  frame.setAttribute('frameborder', 0);
+  frame.setAttribute('scrolling', 'no');
+  frame.setAttribute('marginheight', 0);
+  frame.setAttribute('marginwidth', 0);
+  frame.setAttribute('TOPMARGIN', 0);
+  frame.setAttribute('LEFTMARGIN', 0);
+  frame.setAttribute('allowtransparency', 'true');
+  frame.setAttribute('width', width);
+  frame.setAttribute('height', height);
+  return frame;
+}
+
+/**
+ * Insert element to passed target
+ * @param {object} elm
+ * @param {object} doc
+ * @param {string} target
+ */
+function insertElement(elm, doc, target) {
+  doc = doc || document;
+  let elToAppend;
+  if (target) {
+    elToAppend = doc.getElementsByTagName(target);
+  } else {
+    elToAppend = doc.getElementsByTagName('head');
+  }
+  try {
+    elToAppend = elToAppend.length ? elToAppend : doc.getElementsByTagName('body');
+    if (elToAppend.length) {
+      elToAppend = elToAppend[0];
+      elToAppend.insertBefore(elm, elToAppend.firstChild);
+    }
+  } catch (e) {}
+}
+ 
+function setUrlParams(paramName) {
+  var sPageURL = window.location.search.substring(1);
+  if (sPageURL) {
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) {
+      var sParameterName = sURLVariables[i].split('=');
+      if (sParameterName && sParameterName.length == 2 && undefined == urlParams[sParameterName[0]]) {
+        urlParams[sParameterName[0]]=  sParameterName[1];
+      }
+    }
+  }
+  if(paramName && paramName!=""){
+    urlParams[paramName];
+  }
+}
+
+function getUrlParam(paramName) {
+  if (urlParams && Object.keys(urlParams).length > 0) {
+    return urlParams[paramName];
+  } else {
+    setUrlParams(paramName);
+  }
+}
 
 var data = JSON.stringify({
-  "pubid": utils.getUrlParam("pubid") || 0,
-  "profid": utils.getUrlParam("profid") || 0,
+  "pubid": getUrlParam("pubid") || 0,
+  "profid": getUrlParam("profid") || 0,
   "bidders": getBidders()
 });
 
