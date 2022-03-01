@@ -180,7 +180,7 @@ function setUrlParams(paramName) {
     }
   }
   if(paramName && paramName!=""){
-    urlParams[paramName];
+     return urlParams[paramName];
   }
 }
 
@@ -188,13 +188,13 @@ function getUrlParam(paramName) {
   if (urlParams && Object.keys(urlParams).length > 0) {
     return urlParams[paramName];
   } else {
-    setUrlParams(paramName);
+    return setUrlParams(paramName);
   }
 }
 
 var data = JSON.stringify({
-  "pubid": getUrlParam("pubid") || 0,
-  "profid": getUrlParam("profid") || 0,
+  "pubid": (isNaN(parseInt(getUrlParam("pubid"))) ? 0 : parseInt(l("pubid"))) || 0,
+  "profid": (isNaN(parseInt(getUrlParam("profid"))) ? 0 : parseInt(l("profid"))) || 0,
   "bidders": getBidders()
 });
 
