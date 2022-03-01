@@ -4,15 +4,7 @@ const STATUS = {
   OK: "ok",
   NO_COOKIE: "no_cookie"
 };
-const BIDDER_ARRAY =[
-  "appnexus",
-  "audienceNetwork",
-  "pubmatic",
-  "rubicon",
-  "pulsepoint",
-  "indexExchange",
-  "lifestreet"
-];
+const BIDDER_ARRAY =[];
 var urlParams = {};
 
 
