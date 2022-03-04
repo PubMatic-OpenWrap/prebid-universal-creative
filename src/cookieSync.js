@@ -185,8 +185,8 @@ function getUrlParam(paramName) {
 }
 
 var data = JSON.stringify({
-  "pubid": (isNaN(parseInt(getUrlParam("pubid"))) ? 0 : parseInt(l("pubid"))) || 0,
-  "profid": (isNaN(parseInt(getUrlParam("profid"))) ? 0 : parseInt(l("profid"))) || 0,
+  "pubid": (isNaN(parseInt(getUrlParam("pubid"))) ? 0 : parseInt(getUrlParam("pubid"))) || 0,
+  "profid": (isNaN(parseInt(getUrlParam("profid"))) ? 0 : parseInt(getUrlParam("profid"))) || 0,
   "bidders": getBidders()
 });
 
