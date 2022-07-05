@@ -206,9 +206,9 @@ window.addEventListener('message', (event) => {
 			if (consent.consentMetadata.gdprApplies) {
 				data.gdpr = 1;
 				data.gdpr_consent = consent.consentString || "";
+				ajax(ENDPOINT, process, JSON.stringify(data), ajaxConfig);
 			}
 		}
-		ajax(ENDPOINT, process, JSON.stringify(data), ajaxConfig);
 	}
 }, false);
 
