@@ -199,7 +199,7 @@ var ajaxConfig = {
 // If consent manager is present below snippet will read consent data and initiate cookie_sync
 window.addEventListener('message', (event) => {
 	consent = event.data;
-	if (event.data.type === 'consent-data' && consent && consent.consentMetadata) {
+	if (consent && consent.type === 'consent-data' && consent.consentMetadata) {
 		if (consent.consentMetadata && !data.gdpr_consent) {
 			if (consent.consentMetadata.gdprApplies) {
 				data.gdpr = 1;
