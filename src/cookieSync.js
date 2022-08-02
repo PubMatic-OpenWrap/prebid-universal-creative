@@ -6,7 +6,8 @@ const STATUS = {
 };
 const BIDDER_ARRAY =[];
 var urlParams = {};
-
+let consent = {};
+let isConsentManagerPresent = false;
 
 function doBidderSync(type, url, bidder) {
   if (!url) {
@@ -184,14 +185,42 @@ function getUrlParam(paramName) {
   }
 }
 
-var data = JSON.stringify({
-  "pubid": (isNaN(parseInt(getUrlParam("pubid"))) ? 0 : parseInt(getUrlParam("pubid"))) || 0,
-  "profid": (isNaN(parseInt(getUrlParam("profid"))) ? 0 : parseInt(getUrlParam("profid"))) || 0,
-  "bidders": getBidders()
-});
+var data = {
+	"pubid": (isNaN(parseInt(getUrlParam("pubid"))) ? 0 : parseInt(getUrlParam("pubid"))) || 0,
+ 	"profid": (isNaN(parseInt(getUrlParam("profid"))) ? 0 : parseInt(getUrlParam("profid"))) || 0,
+  	"bidders": getBidders(),
+	"gdpr": (isNaN(parseInt(getUrlParam("gdpr"))) ? 0 : parseInt(getUrlParam("gdpr"))) || 0,
+    "gdpr_consent": getUrlParam("gdpr_consent") || ""
+}
 
 var ajaxConfig = {
   withCredentials: true
 };
 
-ajax(ENDPOINT, process, data, ajaxConfig);
+// If consent is provided within 3000 ms do not call cookie_sync with blank gdpr value
+setTimeout(function(){
+	if(!isConsentManagerPresent) {
+		ajax(ENDPOINT, process, JSON.stringify(data), ajaxConfig);
+	}
+},3000);
+
+
+// If consent manager is present below snippet will read consent data and initiate cookie_sync
+window.addEventListener('message', (event) => {
+	if (event.data.type === 'consent-data') {
+		consent = event.data;
+		if (consent.consentMetadata && !data.gdpr_consent) {
+			isConsentManagerPresent = true;
+			if (consent.consentMetadata.gdprApplies) {
+				data.gdpr = 1;
+				data.gdpr_consent = consent.consentString || "";
+				ajax(ENDPOINT, process, JSON.stringify(data), ajaxConfig);
+			}
+		}
+	}
+}, false);
+
+window.parent.postMessage({
+	sentinel: 'amp',
+	type: 'send-consent-data'
+}, '*');
