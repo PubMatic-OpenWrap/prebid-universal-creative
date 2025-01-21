@@ -1,7 +1,7 @@
 import { loadScript, triggerPixel } from "./utils";
 
 const AD_ANCHOR_CLASS_NAME = 'pb-click';
-const ASSET_ID_ELEMENT_ATTRIBUTE = 'hb_native_asset_id';
+const ASSET_ID_ELEMENT_ATTRIBUTE = 'pwt_native_asset_id';
 
 export function fireNativeImpressionTrackers(adId, sendMessage) {
     const message = {
@@ -23,7 +23,7 @@ export function addNativeClickTrackers(adId, sendMessage) {
     for (let i = 0; i < adElements.length; i++) {
         adElements[i].addEventListener('pointerdown', (event) => {
             let targetElement = event.target;
-            // check if clicked element is associated with any native asset (look for 'hb_native_asset_id' attribute)
+            // check if clicked element is associated with any native asset (look for 'pwt_native_asset_id' attribute)
             let assetId = targetElement && targetElement.getAttribute(ASSET_ID_ELEMENT_ATTRIBUTE);
             message.assetId = assetId;
             sendMessage(message);
